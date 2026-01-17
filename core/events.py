@@ -4,6 +4,7 @@
 
 
 from utils.io import print_slow
+import random
 
 def apply_effects(effects, state):
     """
@@ -83,7 +84,43 @@ def apply_effects(effects, state):
                 print_slow("\n📦 Вы доставили заказ!")
                 reward = state.current_order.reward
                 state.current_order.complete(state)
+                state.current_order.complete(state)
                 print_slow(f"Получено: {reward} кредитов")
+
+        elif effect_type == "police_bribe_attempt":
+            # Логика попытки взятки
+            reward = state.current_order.reward
+            bribe_amount = int(reward * (2/3))
+            
+            if state.money < bribe_amount:
+                # Недостаточно денег - сразу провал
+                state.flags.set("police_bribe_success", False)
+                state.flags.set("police_bribe_no_money", True)
+                print_slow("У вас недостаточно денег для взятки.")
+            else:
+                 # Деньги есть, пробуем
+                 if random.random() < 0.5:
+                     # Успех
+                     state.spend_money(bribe_amount)
+                     state.flags.set("police_bribe_success", True)
+                     state.flags.set("police_bribe_no_money", False)
+                     # Мы не сбрасываем encounter_failed здесь, это решается в диалоге
+                 else:
+                     # Провал
+                     state.flags.set("police_bribe_success", False)
+                     state.flags.set("police_bribe_no_money", False)
+                     # Штраф будет выписан в диалоге, или тут?
+                     # Давайте просто поставим флаг провала, а диалог покажет результат.
+
+        elif effect_type == "pay_police_fine":
+             # Оплата штрафа
+             amount = effect["amount_multiplier"] * state.current_order.reward
+             if state.spend_money(int(amount)):
+                 state.flags.set("police_fine_paid", True)
+                 state.current_order.fail(state) # Конфискация и провал
+             else:
+                 state.flags.set("police_fine_paid", False)
+                 state.die("Пожизненное заключение за неуплату штрафа")
 
 
 def check_condition(condition, state):
@@ -125,6 +162,11 @@ def check_condition(condition, state):
 
     elif cond_type == "has_cargo":
         return condition["item"] in state.cargo
+
+    elif cond_type == "is_contraband_detected":
+         # Проверка, есть ли контрабанда
+         if not state.current_order: return False
+         return state.current_order.is_contraband
 
     return True  # Если условие неизвестно — пропускаем
 

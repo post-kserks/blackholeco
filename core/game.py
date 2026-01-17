@@ -52,7 +52,8 @@ def game_loop(state):
         print("6. Завершить день")
         print("7. Сохранить игру")
         print("8. Карта галактики")
-        print("9. Выйти в меню")
+        print("9. Проложить маршрут")
+        print("10. Выйти в меню")
 
         choice = input("> ").strip()
 
@@ -73,7 +74,11 @@ def game_loop(state):
             print_slow("Игра сохранена.")
         elif choice == "8":
             show_map(state)
+        elif choice == "8":
+            show_map(state)
         elif choice == "9":
+            plan_route(state)
+        elif choice == "10":
             print_slow("Возврат в меню...")
             break
         else:
@@ -157,100 +162,98 @@ def travel_to_planet(state):
 
         if 1 <= choice <= len(available):
             destination = available[choice - 1]
-            
-            # Рассчет маршрута
-            path, dist = get_path(state.current_planet, destination)
-            if not path:
-                print_slow("Нет доступного маршрута до этой планеты.")
-                return
-
-            # Рассчет затрат
-            engine_level = state.ship.engine.level
-            fuel_cost = int(dist * 0.5 * (1 + (engine_level * 0.2)))
-            ap_cost = int(25 / engine_level)
-            
-            # Проверка ресурсов
-            if state.action_points < ap_cost:
-                print_slow(f"\nНедостаточно очков действий! Нужно {ap_cost}, у вас {state.action_points}.")
-                print_slow("Завершите день, чтобы восстановить силы.")
-                return
-
-            max_fuel = state.ship.fuel
-            # Если топлива не хватает на полный путь
-            if fuel_cost > max_fuel:
-                 reachable_path, reachable_dist, reached = get_max_reachable_path(state.current_planet, destination, max_fuel / (0.5 * (1 + (engine_level * 0.2))))
-                 # Пересчитываем реальную стоимость до точки остановки
-                 # Или проще: просто летим пока есть топливо по шагам?
-                 # Давайте использовать логику: если не хватает на полный путь, предупреждаем
-                 print_slow(f"\n⚠️ ВНИМАНИЕ: Недостаточно топлива для полного маршрута!")
-                 print(f"Требуется: {fuel_cost}, у вас: {state.ship.fuel}")
-                 print("Вы остановитесь на полпути.")
-
-            print(f"\nМаршрут: {' -> '.join(path)}")
-            print(f"Затраты: {fuel_cost} топлива, {ap_cost} AP")
-            print("1. Начать полёт")
-            print("2. Отмена")
-            
-            if input("> ").strip() != "1":
-                return
-
-            # Начало полёта
-            state.action_points -= ap_cost
-            current_node_index = 0
-            
-            # Пошаговое движение по планетам
-            # path включает стартовую точку [Start, stop1, stop2, End]
-            # Нам нужно двигаться по сегментам
-            
-            print_slow("\nСистемы корабля: НОРМА.")
-            print_slow("Двигатели: ЗАПУСК...")
-            
-            for i in range(len(path) - 1):
-                start_node = path[i]
-                next_node = path[i+1]
-                
-                segment_dist = GALAXY_GRAPH[start_node][next_node]
-                segment_fuel = int(segment_dist * 0.5 * (1 + (engine_level * 0.2)))
-
-                if not state.ship.use_fuel(segment_fuel):
-                    print_slow("\n⚠️ ТОПЛИВО НА ИСХОДЕ!")
-                    print_slow("Двигатели глохнут...")
-                    state.current_planet = start_node # Остаемся на предыдущей точке
-                    print_slow(f"Аварийная остановка в системе {state.current_planet}.")
-                    return
-
-                print_slow(f"Перелёт: {start_node} -> {next_node}...", delay=0.5)
-                
-                # Проверка полиции
-                if not check_police_encounter(state):
-                     # Если полёт прерван (тюрьма/смерть) - стоп
-                     return 
-                     
-                state.current_planet = next_node
-
-                # Проверка опасных зон (после прибытия)
-                dead_zone_check(state, next_node)
-                if not state.alive:
-                    return
-
-            print_slow(f"\nВы прибыли на {state.current_planet}.")
-            
-            # Проверка доставки
-            if state.current_order and state.current_order.destination == state.current_planet:
-                 # В диалоге будет кнопка "Завершить заказ"
-                 template_id = random.choice([
-                     "recipient_standard", 
-                     "recipient_rude", 
-                     "recipient_grateful", 
-                     "recipient_foreigner"
-                 ])
-                 
-                 recipient_dialog = load_dialog(template_id)
-                 if recipient_dialog:
-                      run_dialog(recipient_dialog, state)
+            perform_travel(state, destination)
     
     except ValueError:
         print("Неверный ввод.")
+
+
+def perform_travel(state, destination):
+    """Выполнить перелёт к пункту назначения"""
+    # Рассчет маршрута
+    path, dist = get_path(state.current_planet, destination)
+    if not path:
+        print_slow("Нет доступного маршрута до этой планеты.")
+        return
+
+    # Рассчет затрат
+    engine_level = state.ship.engine.level
+    fuel_cost = int(dist * 0.5 * (1 + (engine_level * 0.2)))
+    ap_cost = int(25 / engine_level)
+    
+    # Проверка ресурсов
+    if state.action_points < ap_cost:
+        print_slow(f"\nНедостаточно очков действий! Нужно {ap_cost}, у вас {state.action_points}.")
+        print_slow("Завершите день, чтобы восстановить силы.")
+        return
+
+    max_fuel = state.ship.fuel
+    # Если топлива не хватает на полный путь
+    if fuel_cost > max_fuel:
+         reachable_path, reachable_dist, reached = get_max_reachable_path(state.current_planet, destination, max_fuel / (0.5 * (1 + (engine_level * 0.2))))
+         print_slow(f"\n⚠️ ВНИМАНИЕ: Недостаточно топлива для полного маршрута!")
+         print(f"Требуется: {fuel_cost}, у вас: {state.ship.fuel}")
+         print("Вы остановитесь на полпути.")
+
+    print(f"\nМаршрут: {' -> '.join(path)}")
+    print(f"Затраты: {fuel_cost} топлива, {ap_cost} AP")
+    print("1. Начать полёт")
+    print("2. Отмена")
+    
+    if input("> ").strip() != "1":
+        return
+
+    # Начало полёта
+    state.action_points -= ap_cost
+    current_node_index = 0
+    
+    print_slow("\nСистемы корабля: НОРМА.")
+    print_slow("Двигатели: ЗАПУСК...")
+    
+    for i in range(len(path) - 1):
+        start_node = path[i]
+        next_node = path[i+1]
+        
+        segment_dist = GALAXY_GRAPH[start_node][next_node]
+        segment_fuel = int(segment_dist * 0.5 * (1 + (engine_level * 0.2)))
+
+        if not state.ship.use_fuel(segment_fuel):
+            print_slow("\n⚠️ ТОПЛИВО НА ИСХОДЕ!")
+            print_slow("Двигатели глохнут...")
+            state.ship.fuel = 0
+            state.current_planet = start_node # Остаемся на предыдущей точке
+            print_slow(f"Аварийная остановка в системе {state.current_planet}.")
+            return
+
+        print_slow(f"Перелёт: {start_node} -> {next_node}...", delay=0.5)
+        
+        # Проверка полиции
+        if not check_police_encounter(state):
+             # Если полёт прерван (тюрьма/смерть) - стоп
+             return 
+             
+        state.current_planet = next_node
+
+        # Проверка опасных зон (после прибытия)
+        dead_zone_check(state, next_node)
+        if not state.alive:
+            return
+
+    print_slow(f"\nВы прибыли на {state.current_planet}.")
+    
+    # Проверка доставки
+    if state.current_order and state.current_order.destination == state.current_planet:
+         # В диалоге будет кнопка "Завершить заказ"
+         template_id = random.choice([
+             "recipient_standard", 
+             "recipient_rude", 
+             "recipient_grateful", 
+             "recipient_foreigner"
+         ])
+         
+         recipient_dialog = load_dialog(template_id)
+         if recipient_dialog:
+              run_dialog(recipient_dialog, state)
 
 
 def dead_zone_check(state, planet):
@@ -301,6 +304,91 @@ def show_map(state):
         for neighbor, dist in neighbors.items():
              print(f"      -> {neighbor}: {dist}")
     input("\n[Нажмите Enter для продолжения]")
+
+
+def plan_route(state):
+    """Интерактивный планировщик маршрутов"""
+    print("\n=== ПРОЛОЖИТЬ МАРШРУТ ===")
+    print("Куда летим?")
+    
+    available = [p for p in GALAXY_GRAPH.keys() if p != state.current_planet]
+    for i, planet in enumerate(available, 1):
+        print(f"{i}. {planet}")
+    print(f"{len(available) + 1}. Отмена")
+
+    try:
+        choice = int(input("> ").strip())
+        if choice == len(available) + 1:
+            return
+
+        if 1 <= choice <= len(available):
+            destination = available[choice - 1]
+            path, dist = get_path(state.current_planet, destination)
+            
+            if not path:
+                print_slow("Нет доступного маршрута.")
+                return
+
+            # Расчет стоимости
+            engine_level = state.ship.engine.level
+            fuel_cost = int(dist * 0.5 * (1 + (engine_level * 0.2)))
+            ap_cost = int(len(path) - 1) * int(25 / engine_level) # Примерный расчет по сегментам?
+            # В travel_to_planet ap_cost считается за *перелет*. 
+            # Но подождите, в travel_to_planet ap_cost считается ОДИН раз за весь вызов travel_to_planet.
+            # А travel_to_planet летит по сегментам.
+            # Давайте посмотрим travel_to_planet.
+            # Там ap_cost = 25 / level. И это вычитается ОДИН раз.
+            # Значит и здесь должно быть так же.
+            ap_cost = int(25 / engine_level)
+
+            days = 1
+            if ap_cost > 100: 
+                # Если стоимость больше 100 за раз (невозможно при нынешнем балансе),
+                # но если бы была...
+                days = (ap_cost // 100) + 1
+            
+            # А если мы хотим показать, что при полете на дальние дистанции
+            # мы можем потратить несколько дней?
+            # Сейчас travel_to_planet делает все за один раз.
+            # Если топлива не хватает, мы останавливаемся.
+            # Пользователь просит показать "Время: 3 дня".
+            # Это подразумевает, что долгий путь занимает время.
+            # Пока у нас мгновенное перемещение, но давайте симулировать,
+            # что если AP > state.action_points, нам придется "ждать".
+            # Но фактически сейчас мы тратим 1 "тик" AP.
+            # Давайте пока оставим "Время: <1 дня" или просто "Время: Мгновенно" 
+            # пока не переделаем систему времени.
+            # А, пользователь просит "Время: 3 дня" для Outer Ring.
+            # Outer Ring далеко.
+            # Похоже пользователь хочет механику длительных путешествий?
+            # Или это просто "флейвор"?
+            # Давайте сделаем флейвор текст "Примерное время в пути".
+            estimated_days = max(1, int(dist / 300)) # Грубая прикидка
+            
+            print(f"\nОптимальный маршрут:")
+            print(f"{' -> '.join(path)}")
+            print(f"Стоимость: {fuel_cost} топлива") # Уберем "1000", оставим топливо
+            print(f"Энергия: {ap_cost} AP")
+            print(f"Примерное время: {estimated_days} дн.")
+            
+            print("\n[1] Лететь")
+            print("[2] Отменить")
+            
+            if input("> ").strip() == "1":
+                # Запускаем существующую функцию путешествия
+                # Но нам нужно передать выбор... 
+                # travel_to_planet сама спрашивает ввод.
+                # Мы не можем просто вызвать её и заставить лететь туда.
+                # Нам придется дублировать логику или рефакторить travel_to_planet.
+                # Для простоты сейчас, мы можем просто сказать "Используйте меню полета".
+                # НО пользователь просил "[1] Лететь".
+                # Значит нам нужно уметь запускать полет с параметрами.
+                # Рефакторинг travel_to_planet чтобы принимать destination аргумент.
+                # Рефакторинг travel_to_planet чтобы принимать destination аргумент.
+                perform_travel(state, destination)
+
+    except ValueError:
+        print("Неверный ввод.")
 
 
 def end_day(state):
