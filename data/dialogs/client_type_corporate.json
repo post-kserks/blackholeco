@@ -1,0 +1,67 @@
+{
+    "meta": {
+        "id": "client_type_corporate",
+        "character": "Менеджер Black Hole Co.",
+        "location": "VIP-зона"
+    },
+    "nodes": {
+        "start": {
+            "text": "Приветствую, коллега. У нас есть приоритетная задача от Корпорации. Требуется транспортировка {cargo} в систему {destination}. Вы заинтересованы?",
+            "choices": [
+                {
+                    "text": "Какова ставка?",
+                    "next": "reward"
+                },
+                {
+                    "text": "Всегда готов служить Корпорации.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "confirm_pending_order"
+                        }
+                    ]
+                },
+                {
+                    "text": "В другой раз.",
+                    "next": "reject",
+                    "effects": [
+                        {
+                            "type": "reject_pending_order"
+                        }
+                    ]
+                }
+            ]
+        },
+        "reward": {
+            "text": "Стандартная ставка для этого сектора: {reward} кредитов. Плюс, разумеется, благодарность руководства.",
+            "choices": [
+                {
+                    "text": "Принимаю условия.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "confirm_pending_order"
+                        }
+                    ]
+                },
+                {
+                    "text": "Отказываюсь.",
+                    "next": "reject",
+                    "effects": [
+                        {
+                            "type": "reject_pending_order"
+                        }
+                    ]
+                }
+            ]
+        },
+        "end": {
+            "text": "Превосходно. Документы отправлены на ваш терминал. Выполняйте.",
+            "choices": []
+        },
+        "reject": {
+            "text": "Принято. Мы найдём более лояльного исполнителя.",
+            "choices": []
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "meta": {
+        "id": "recipient_foreigner",
+        "character": "Инопланетянин",
+        "location": "Торговый пост"
+    },
+    "nodes": {
+        "start": {
+            "text": "Привет. Моя твоя ждать. Груз быть здесь?",
+            "choices": [
+                {
+                    "text": "Да, груз здесь.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "complete_order"
+                        }
+                    ]
+                }
+            ]
+        },
+        "end": {
+            "text": "Твоя хороший пилот. Моя давать кредиты. Мир.",
+            "choices": []
+        }
+    }
+}

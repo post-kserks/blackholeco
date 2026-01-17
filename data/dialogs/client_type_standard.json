@@ -1,0 +1,67 @@
+{
+    "meta": {
+        "id": "client_type_standard",
+        "character": "Клиент",
+        "location": "Офис Black Hole Co."
+    },
+    "nodes": {
+        "start": {
+            "text": "Здравствуйте. Мне нужно доставить груз. Это {cargo}. Пункт назначения: {destination}.",
+            "choices": [
+                {
+                    "text": "Сколько вы платите?",
+                    "next": "reward"
+                },
+                {
+                    "text": "Я берусь.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "confirm_pending_order"
+                        }
+                    ]
+                },
+                {
+                    "text": "Нет, спасибо.",
+                    "next": "reject",
+                    "effects": [
+                        {
+                            "type": "reject_pending_order"
+                        }
+                    ]
+                }
+            ]
+        },
+        "reward": {
+            "text": "Оплата составляет {reward} кредитов.",
+            "choices": [
+                {
+                    "text": "Договорились.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "confirm_pending_order"
+                        }
+                    ]
+                },
+                {
+                    "text": "Маловато будет. Я пас.",
+                    "next": "reject",
+                    "effects": [
+                        {
+                            "type": "reject_pending_order"
+                        }
+                    ]
+                }
+            ]
+        },
+        "end": {
+            "text": "Отлично. Вот координаты и груз. Удачи.",
+            "choices": []
+        },
+        "reject": {
+            "text": "Жаль. Пойду искать другого курьера.",
+            "choices": []
+        }
+    }
+}

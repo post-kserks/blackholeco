@@ -1,0 +1,45 @@
+{
+    "meta": {
+        "id": "recipient_rude",
+        "character": "Нервный тип",
+        "location": "Подворотня"
+    },
+    "nodes": {
+        "start": {
+            "text": "Ну наконец-то! Я уже думал, ты сдох где-то по дороге. Давай сюда, живо!",
+            "choices": [
+                {
+                    "text": "Полегче. Вот груз.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "complete_order"
+                        }
+                    ]
+                },
+                {
+                    "text": "Может, спасибо скажешь?",
+                    "next": "argument"
+                }
+            ]
+        },
+        "argument": {
+            "text": "Спасибо в карман не положишь. Держи свои кредиты и проваливай.",
+            "choices": [
+                {
+                    "text": "Ладно, бывай.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "complete_order"
+                        }
+                    ]
+                }
+            ]
+        },
+        "end": {
+            "text": "Ага. Вали уже.",
+            "choices": []
+        }
+    }
+}

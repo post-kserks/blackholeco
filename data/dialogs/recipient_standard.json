@@ -1,0 +1,27 @@
+{
+    "meta": {
+        "id": "recipient_standard",
+        "character": "Получатель",
+        "location": "Зона выдачи"
+    },
+    "nodes": {
+        "start": {
+            "text": "Здравствуйте. Вы привезли посылку? Давайте сюда.",
+            "choices": [
+                {
+                    "text": "Вот ваш груз.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "complete_order"
+                        }
+                    ]
+                }
+            ]
+        },
+        "end": {
+            "text": "Всё в порядке. Деньги переведены на ваш счёт. Спасибо.",
+            "choices": []
+        }
+    }
+}

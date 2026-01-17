@@ -1,0 +1,152 @@
+{
+    "meta": {
+        "id": "intro",
+        "character": "Директор Кроу",
+        "location": "Офис Директора",
+        "important": true
+    },
+    "start": "start",
+    "nodes": {
+        "start": {
+            "text": "Добро пожаловать в Black Hole Co., пилот. Я — Директор Кроу. Вы здесь, потому что вам нужны деньги, а нам нужны те, кто готов рискнуть.",
+            "choices": [
+                {
+                    "text": "Я готов работать.",
+                    "effects": [
+                        {
+                            "type": "flag",
+                            "name": "accepted_job"
+                        },
+                        {
+                            "type": "reputation",
+                            "faction": "BlackHoleCo",
+                            "amount": 5
+                        }
+                    ],
+                    "next": "accept"
+                },
+                {
+                    "text": "Что за работа?",
+                    "next": "explain"
+                },
+                {
+                    "text": "Мне это не нравится. Я ухожу.",
+                    "effects": [
+                        {
+                            "type": "end_game",
+                            "reason": "Вы отказались от работы и покинули станцию."
+                        }
+                    ]
+                }
+            ]
+        },
+        "explain": {
+            "text": "Мы занимаемся... логистикой. Доставка грузов туда, куда другие не суются. Опасные зоны, спорные территории, иногда — мимо патрулей. За это хорошо платят.",
+            "choices": [
+                {
+                    "text": "Звучит рискованно, но я в деле.",
+                    "effects": [
+                        {
+                            "type": "flag",
+                            "name": "accepted_job"
+                        },
+                        {
+                            "type": "flag",
+                            "name": "knows_truth"
+                        },
+                        {
+                            "type": "reputation",
+                            "faction": "BlackHoleCo",
+                            "amount": 3
+                        }
+                    ],
+                    "next": "accept"
+                },
+                {
+                    "text": "Это контрабанда?",
+                    "next": "contraband_question"
+                },
+                {
+                    "text": "Нет, спасибо.",
+                    "effects": [
+                        {
+                            "type": "end_game",
+                            "reason": "Вы отказались от сомнительной работы."
+                        }
+                    ]
+                }
+            ]
+        },
+        "contraband_question": {
+            "text": "Контрабанда — такое грубое слово. Мы предпочитаем называть это 'альтернативной логистикой'. Но если вас это беспокоит — большинство наших заказов вполне легальны. Мы не заставляем никого нарушать закон... если он сам не захочет.",
+            "choices": [
+                {
+                    "text": "Ладно, я попробую. Но только легальные заказы.",
+                    "effects": [
+                        {
+                            "type": "flag",
+                            "name": "accepted_job"
+                        },
+                        {
+                            "type": "flag",
+                            "name": "legal_only"
+                        },
+                        {
+                            "type": "reputation",
+                            "faction": "BlackHoleCo",
+                            "amount": 1
+                        },
+                        {
+                            "type": "reputation",
+                            "faction": "Union",
+                            "amount": 3
+                        }
+                    ],
+                    "next": "accept_legal"
+                },
+                {
+                    "text": "Где подписать?",
+                    "effects": [
+                        {
+                            "type": "flag",
+                            "name": "accepted_job"
+                        },
+                        {
+                            "type": "flag",
+                            "name": "no_questions"
+                        },
+                        {
+                            "type": "reputation",
+                            "faction": "BlackHoleCo",
+                            "amount": 10
+                        },
+                        {
+                            "type": "reputation",
+                            "faction": "Syndicate",
+                            "amount": 5
+                        }
+                    ],
+                    "next": "accept"
+                }
+            ]
+        },
+        "accept": {
+            "text": "Отлично. Вам присвоен корабль класса 'Грузовик'. Старенький, но надёжный. Гриз в доках поможет разобраться. Ваш первый день начинается сейчас. Удачи, пилот — она вам понадобится.",
+            "choices": [
+                {
+                    "text": "[Начать игру]",
+                    "next": null
+                }
+            ]
+        },
+        "accept_legal": {
+            "text": "Как хотите. Но знайте — настоящие деньги делаются на риске. Впрочем, для начала и обычных заказов хватит. Корабль ждёт вас в доках. Гриз введёт в курс дела.",
+            "choices": [
+                {
+                    "text": "[Начать игру]",
+                    "next": null
+                }
+            ]
+        }
+    }
+}

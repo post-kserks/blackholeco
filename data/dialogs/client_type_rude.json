@@ -1,0 +1,67 @@
+{
+    "meta": {
+        "id": "client_type_rude",
+        "character": "Грубый тип",
+        "location": "Тёмный угол космопорта"
+    },
+    "nodes": {
+        "start": {
+            "text": "Эй, ты! У меня есть работа. Надо перевезти {cargo}. Куда? На {destination}. Вопросы есть?",
+            "choices": [
+                {
+                    "text": "Что по деньгам?",
+                    "next": "reward"
+                },
+                {
+                    "text": "Загружай.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "confirm_pending_order"
+                        }
+                    ]
+                },
+                {
+                    "text": "Ищи другого дурака.",
+                    "next": "reject",
+                    "effects": [
+                        {
+                            "type": "reject_pending_order"
+                        }
+                    ]
+                }
+            ]
+        },
+        "reward": {
+            "text": "{reward} кредитов. И не торгуйся, не люблю я это.",
+            "choices": [
+                {
+                    "text": "Ладно, беру.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "confirm_pending_order"
+                        }
+                    ]
+                },
+                {
+                    "text": "Я пас.",
+                    "next": "reject",
+                    "effects": [
+                        {
+                            "type": "reject_pending_order"
+                        }
+                    ]
+                }
+            ]
+        },
+        "end": {
+            "text": "Вот и славно. И смотри мне, не потеряй груз.",
+            "choices": []
+        },
+        "reject": {
+            "text": "Пф-ф. Вали отсюда.",
+            "choices": []
+        }
+    }
+}

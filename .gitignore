@@ -1,0 +1,15 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Mac OS
+.DS_Store
+
+# Game Saves
+saves/
+# Exclude individual save files if they are not in a folder, though header says saves/ is a folder
+*.json
+!data/**/*.json
+!characters/**/*.json

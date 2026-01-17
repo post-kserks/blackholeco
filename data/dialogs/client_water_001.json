@@ -1,0 +1,145 @@
+{
+    "meta": {
+        "id": "client_water_001",
+        "character": "Нервный клиент",
+        "location": "Офис Black Hole Co.",
+        "important": true
+    },
+    "start": "greeting",
+    "nodes": {
+        "greeting": {
+            "text": "Вы курьер? Отлично. Мне нужно срочно отправить посылку на планету Вода.",
+            "choices": [
+                {
+                    "text": "Что в посылке?",
+                    "next": "cargo_question"
+                },
+                {
+                    "text": "Планета Вода… слышал о ней.",
+                    "next": "water_comment"
+                }
+            ]
+        },
+        "cargo_question": {
+            "text": "Обычное оборудование. Документы в порядке, можете не переживать.",
+            "choices": [
+                {
+                    "text": "Почему такая спешка?",
+                    "next": "hurry_reason"
+                },
+                {
+                    "text": "Хорошо, продолжайте.",
+                    "next": "warning"
+                }
+            ]
+        },
+        "water_comment": {
+            "text": "Да… в ближайшие дни там будет, скажем так, шумно.",
+            "choices": [
+                {
+                    "text": "Шумно?",
+                    "next": "robot_hint"
+                }
+            ]
+        },
+        "hurry_reason": {
+            "text": "Мне сказали, что после завтрашнего дня на орбиту никого не пустят.",
+            "choices": [
+                {
+                    "text": "Почему?",
+                    "next": "robot_hint"
+                }
+            ]
+        },
+        "robot_hint": {
+            "text": "Тестовый запуск. Новый боевой робот. Модель 001. Говорят, он ещё нестабилен.",
+            "choices": [
+                {
+                    "text": "Это опасно?",
+                    "next": "danger",
+                    "effects": [
+                        {
+                            "type": "flag",
+                            "name": "heard_about_robot_001"
+                        }
+                    ]
+                },
+                {
+                    "text": "Меня это не касается.",
+                    "next": "indifferent"
+                }
+            ]
+        },
+        "danger": {
+            "text": "Если честно? Я бы не стал задерживаться рядом с Водой во время теста.",
+            "choices": [
+                {
+                    "text": "Я учту это.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "flag",
+                            "name": "warned_about_water"
+                        },
+                        {
+                            "type": "unlock_event",
+                            "id": "robot_001_test"
+                        },
+                        {
+                            "type": "give_order",
+                            "cargo": "Оборудование для робота",
+                            "destination": "Вода",
+                            "reward": 500
+                        }
+                    ]
+                }
+            ]
+        },
+        "indifferent": {
+            "text": "Ваше дело. Главное — доставьте посылку вовремя.",
+            "choices": [
+                {
+                    "text": "Принять заказ.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "flag",
+                            "name": "heard_about_robot_001"
+                        },
+                        {
+                            "type": "give_order",
+                            "cargo": "Оборудование для робота",
+                            "destination": "Вода",
+                            "reward": 500
+                        }
+                    ]
+                }
+            ]
+        },
+        "warning": {
+            "text": "Только будьте осторожны. На орбите может быть... неспокойно.",
+            "choices": [
+                {
+                    "text": "Я готов.",
+                    "next": "end",
+                    "effects": [
+                        {
+                            "type": "flag",
+                            "name": "heard_about_robot_001"
+                        },
+                        {
+                            "type": "give_order",
+                            "cargo": "Оборудование для робота",
+                            "destination": "Вода",
+                            "reward": 500
+                        }
+                    ]
+                }
+            ]
+        },
+        "end": {
+            "text": "Клиент передаёт вам контейнер и отворачивается.",
+            "choices": []
+        }
+    }
+}
