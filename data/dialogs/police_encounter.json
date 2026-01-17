@@ -1,0 +1,108 @@
+{
+    "meta": {
+        "character": "Полиция"
+    },
+    "start": "check_contraband",
+    "nodes": {
+        "check_contraband": {
+            "text": "Патруль сканирует ваш грузовой отсек...",
+            "choices": [
+                {
+                    "text": "[Продолжить]",
+                    "conditions": [
+                        {
+                            "type": "is_contraband_detected"
+                        }
+                    ],
+                    "next": "contraband_found"
+                },
+                {
+                    "text": "[Продолжить]",
+                    "conditions": [
+                        {
+                            "type": "flag_not",
+                            "name": "is_contraband_detected"
+                        }
+                    ],
+                    "next": "clean"
+                }
+            ]
+        },
+        "clean": {
+            "text": "Всё чисто. Счастливого пути.",
+            "choices": []
+        },
+        "contraband_found": {
+            "text": "ОБНАРУЖЕНА КОНТРАБАНДА! Груз '{cargo}' находится в списке запрещённых товаров. Что будем делать?",
+            "choices": [
+                {
+                    "text": "Дать взятку [Шанс 50%]",
+                    "effects": [
+                        {
+                            "type": "police_bribe_attempt"
+                        }
+                    ],
+                    "next": "bribe_result"
+                },
+                {
+                    "text": "Признать вину (Штраф {reward} кр. + Конфискация)",
+                    "effects": [
+                        {
+                            "type": "pay_police_fine",
+                            "amount_multiplier": 1.0
+                        }
+                    ],
+                    "next": "fine_paid"
+                }
+            ]
+        },
+        "bribe_result": {
+            "text": "Подождите...",
+            "choices": [
+                {
+                    "text": "[Результат]",
+                    "conditions": [
+                        {
+                            "type": "flag",
+                            "name": "police_bribe_success"
+                        }
+                    ],
+                    "next": "bribe_success"
+                },
+                {
+                    "text": "[Результат]",
+                    "conditions": [
+                        {
+                            "type": "flag_not",
+                            "name": "police_bribe_success"
+                        }
+                    ],
+                    "next": "bribe_fail"
+                }
+            ]
+        },
+        "bribe_success": {
+            "text": "(Шёпотом) Проезжайте. И чтоб я вас больше не видел.",
+            "choices": []
+        },
+        "bribe_fail": {
+            "text": "ПОПЫТКА ПОДКУПА ДОЛЖНОСТНОГО ЛИЦА! Вам выписан штраф в двойном размере: {reward}*2 кр.",
+            "choices": [
+                {
+                    "text": "Оплатить штраф и конфискацию",
+                    "effects": [
+                        {
+                            "type": "pay_police_fine",
+                            "amount_multiplier": 2.0
+                        }
+                    ],
+                    "next": "fine_paid"
+                }
+            ]
+        },
+        "fine_paid": {
+            "text": "Штраф оплачен. Груз конфискован. Свободны.",
+            "choices": []
+        }
+    }
+}

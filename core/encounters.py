@@ -16,71 +16,19 @@ def check_police_encounter(state):
     if random.random() > 0.2:
         return True
 
+    from dialog.loader import load_dialog
+    from dialog.engine import run_dialog
+
     print_slow("\n" + "=" * 40)
     print_slow("🚔 ВНИМАНИЕ! Вас останавливает Галактическая Полиция.")
-    print_slow("Патруль сканирует ваш грузовой отсек...")
-
-    # Если нет заказа или груз легальный
-    if not state.current_order or not state.current_order.is_contraband:
-        print_slow("\n[Полиция]: Всё чисто. Счастливого пути.")
-        print_slow("=" * 40)
-        return True
-
-    # Если груз — контрабанда
-    print_slow("\n[Полиция]: ОБНАРУЖЕНА КОНТРАБАНДА!")
-    print_slow(f"Груз '{state.current_order.cargo}' находится в списке запрещённых товаров.")
     
-    reward = state.current_order.reward
-    bribe_amount = int(reward * (2/3))
-    fine_confess = reward
-    fine_fail_bribe = reward * 2
+    dialog = load_dialog("police_encounter")
+    if dialog:
+        run_dialog(dialog, state)
+    
+    print_slow("=" * 40)
+    
+    # После диалога проверяем, жив ли игрок и не в тюрьме ли он
+    # Если state.alive == False, значит он либо умер, либо в тюрьме (state.die устанавливает alive=False)
+    return state.alive
 
-    print_slow("\nЧто будем делать?")
-    print(f"1. Дать взятку ({bribe_amount} кр.) [Шанс 50%]")
-    print(f"2. Признать вину (Штраф {fine_confess} кр. + Конфискация)")
-
-    while True:
-        choice = input("> ").strip()
-        
-        # 1. Взятка
-        if choice == "1":
-            if state.money < bribe_amount:
-                print_slow("У вас недостаточно денег для взятки.")
-                continue
-
-            # Попытка дачи взятки
-            if random.random() < 0.5:
-                # Успех
-                state.spend_money(bribe_amount)
-                print_slow(f"\n[Полиция]: (Шёпотом) Проезжайте. И чтоб я вас больше не видел.")
-                return True
-            else:
-                # Провал
-                print_slow("\n[Полиция]: ПОПЫТКА ПОДКУПА ДОЛЖНОСТНОГО ЛИЦА!")
-                print_slow(f"Вам выписан штраф в двойном размере: {fine_fail_bribe} кр.")
-                
-                if state.spend_money(fine_fail_bribe):
-                    print_slow("Груз конфискован.")
-                    state.current_order.fail(state) # Провал заказа (репутация падает)
-                    return True
-                else:
-                    print_slow("У вас нет денег на оплату штрафа.")
-                    print_slow("Вас арестовывают и отправляют в тюрьму.")
-                    state.die("Пожизненное заключение за неуплату штрафа")
-                    return False
-
-        # 2. Признание вины
-        elif choice == "2":
-            if state.spend_money(fine_confess):
-                print_slow(f"\nВы оплатили штраф {fine_confess} кр.")
-                print_slow("Груз конфискован.")
-                state.current_order.fail(state)
-                return True
-            else:
-                print_slow("У вас нет денег на оплату штрафа.")
-                print_slow("Вас арестовывают и отправляют в тюрьму.")
-                state.die("Пожизненное заключение за неуплату штрафа")
-                return False
-        
-        else:
-            print("Неверный выбор.")

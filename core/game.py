@@ -74,8 +74,6 @@ def game_loop(state):
             print_slow("Игра сохранена.")
         elif choice == "8":
             show_map(state)
-        elif choice == "8":
-            show_map(state)
         elif choice == "9":
             plan_route(state)
         elif choice == "10":
